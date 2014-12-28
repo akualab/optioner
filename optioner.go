@@ -80,7 +80,6 @@ import (
 	"reflect"
 	"strings"
 
-	_ "golang.org/x/tools/go/gcimporter"
 	"golang.org/x/tools/go/types"
 )
 
