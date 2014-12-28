@@ -14,10 +14,12 @@ This code was adapted from the stringer cmd (golang.org/x/tools/cmd/stringer/).
 
 optioner will generate a file with code of the form:
 
-  // N sets field N in Example.
-  func N(n int) Option {
-	  return func(ex *Example) {
-		  ex.N = n
+  // N sets a value for instances of type Example.
+  func N(o int) option {
+	  return func(t *Example) option {
+		  previous := t.N
+		  t.N = o
+		  return N(previous)
 	  }
   }
 
@@ -39,7 +41,7 @@ For example, given this snippet,
 	  ff     func(int) int
   }
 
-  func NewExample(name string, options ...Option) *Example {
+  func NewExample(name string, options ...option) *Example {
 
 	  // Set required values and initialize optional fields with default values.
 	  ex := &Example{
@@ -51,7 +53,7 @@ For example, given this snippet,
 	  }
 
 	  // Set options.
-	  ex.init(options...)
+	  ex.Option(options...)
   }
 
 go generate will generate option functions for fields N, FSlice, Map, and ff. Your package
@@ -63,8 +65,15 @@ users can now set options as follows:
 the new struct "ex" will use default values for "FSlice" and "Map", and custom values for
 "N" and "ff". Because the argument "name" is required, the field "name" is excluded using a tag.
 
+To temporarily modify a value, do the following:
+
+  prev := ex.Option(N(5)) // previous value is stored in prev.
+  // do something...
+  ex.Option(prev) // restores the previous value.
+
 struct fields don't need to be exported, however, the corresponding option will be exported by
-capitalizing the first letter. Documentation for options is also auto-generated.
+capitalizing the first letter. Documentation for options is auto-generated in the source file
+to make it available to package users in godoc format.
 */
 package main
 
@@ -127,24 +136,26 @@ func main() {
 	g.Printf(header)
 	g.Printf("package %s", g.packageName)
 	g.Printf("\n")
-	g.Printf("// Option type is used to pass options to %s.\n", g.typeName)
-	g.Printf("type Option func(*%s)\n", g.typeName)
+	g.Printf("// Option type is used to set options in %s.\n", g.typeName)
+	g.Printf("type option func(*%s) option\n", g.typeName)
 	g.Printf("\n")
-	g.Printf("// Package author: use this method inside func New%s()\n", g.typeName)
-	g.Printf("// to set optional values.\n")
-	g.Printf("func (t *%s) init(options ...Option) {\n", g.typeName)
-	g.Printf("for _, option := range options {\n")
-	g.Printf("option(t)\n")
+	g.Printf("// Option method sets the options. Returns previous option for last arg.\n")
+	g.Printf("func (t *%s) Option(options ...option) (previous option) {\n", g.typeName)
+	g.Printf("for _, opt := range options {\n")
+	g.Printf("previous = opt(t)\n")
 	g.Printf("}\n")
+	g.Printf("return previous\n")
 	g.Printf("}\n")
 	g.Printf("\n")
 
 	for _, opt := range g.options {
 		tname := strings.Title(opt.name)
-		g.Printf("// %s sets optional value in %s.\n", tname, g.typeName)
-		g.Printf("func %s(o %s) Option {\n", tname, opt.typ)
-		g.Printf("return func(t *%s) {\n", g.typeName)
+		g.Printf("// %s sets a value for instances of type %s.\n", tname, g.typeName)
+		g.Printf("func %s(o %s) option {\n", tname, opt.typ)
+		g.Printf("return func(t *%s) option {\n", g.typeName)
+		g.Printf("previous := t.%s\n", opt.name)
 		g.Printf("t.%s = o\n", opt.name)
+		g.Printf("return %s(previous)\n", tname)
 		g.Printf("}\n")
 		g.Printf("}\n")
 		g.Printf("\n")

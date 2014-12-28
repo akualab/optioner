@@ -6,41 +6,49 @@
 
 package example
 
-// Option type is used to pass options to Example.
-type Option func(*Example)
+// Option type is used to set options in Example.
+type option func(*Example) option
 
-// Package author: use this method inside func NewExample()
-// to set optional values.
-func (t *Example) init(options ...Option) {
-	for _, option := range options {
-		option(t)
+// Option method sets the options. Returns previous option for last arg.
+func (t *Example) Option(options ...option) (previous option) {
+	for _, opt := range options {
+		previous = opt(t)
 	}
+	return previous
 }
 
-// N sets optional value in Example.
-func N(o int) Option {
-	return func(t *Example) {
+// N sets a value for instances of type Example.
+func N(o int) option {
+	return func(t *Example) option {
+		previous := t.N
 		t.N = o
+		return N(previous)
 	}
 }
 
-// FSlice sets optional value in Example.
-func FSlice(o []float64) Option {
-	return func(t *Example) {
+// FSlice sets a value for instances of type Example.
+func FSlice(o []float64) option {
+	return func(t *Example) option {
+		previous := t.FSlice
 		t.FSlice = o
+		return FSlice(previous)
 	}
 }
 
-// Map sets optional value in Example.
-func Map(o map[string]int) Option {
-	return func(t *Example) {
+// Map sets a value for instances of type Example.
+func Map(o map[string]int) option {
+	return func(t *Example) option {
+		previous := t.Map
 		t.Map = o
+		return Map(previous)
 	}
 }
 
-// Ff sets optional value in Example.
-func Ff(o func(int) int) Option {
-	return func(t *Example) {
+// Ff sets a value for instances of type Example.
+func Ff(o func(int) int) option {
+	return func(t *Example) option {
+		previous := t.ff
 		t.ff = o
+		return Ff(previous)
 	}
 }

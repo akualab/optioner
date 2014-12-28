@@ -16,7 +16,7 @@ type Example struct {
 
 // NewExample creates an example.
 // name is required.
-func NewExample(name string, options ...Option) *Example {
+func NewExample(name string, options ...option) *Example {
 
 	// Set required values and initialize optional fields with default values.
 	ex := &Example{
@@ -28,7 +28,7 @@ func NewExample(name string, options ...Option) *Example {
 	}
 
 	// Set options.
-	ex.init(options...)
+	ex.Option(options...)
 
 	fmt.Printf("Example initalized: %+v\n", ex)
 	return ex

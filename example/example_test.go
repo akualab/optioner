@@ -18,4 +18,19 @@ func TestExample(t *testing.T) {
 	if cap(ex.FSlice) != 100 {
 		t.Errorf("FSlice cap is %d, expected 100", cap(ex.FSlice))
 	}
+
+	// Change one of the options. prev has the previous value.
+	prev := ex.Option(N(5))
+
+	if ex.N != 5 {
+		t.Errorf("N is %d, expected 22", ex.N)
+	}
+
+	// restore previous value.
+	ex.Option(prev)
+
+	if ex.N != 22 {
+		t.Errorf("N is %d, expected 22", ex.N)
+	}
+
 }
