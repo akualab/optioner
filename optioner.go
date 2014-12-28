@@ -4,7 +4,7 @@
 
 /*
 optioner is a tool to generate functional options. Intended to be
-used with go generate; see the invocation in example/hello.go.
+used with go generate; see the invocation in example/example.go.
 
 To learn about functional options, see:
 http://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis
