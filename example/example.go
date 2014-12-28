@@ -8,9 +8,9 @@ import (
 //go:generate optioner -type Example
 type Example struct {
 	N      int
-	FSlice []float64 `opt:"myName,omitempty"`
+	FSlice []float64 `json:"float_slice"`
 	Map    map[string]int
-	Name   string
+	Name   string `opt:"-" json:"name"`
 	ff     func(int) int
 }
 
@@ -24,49 +24,12 @@ func NewExample(name string, options ...Option) *Example {
 		N:      10,
 		FSlice: make([]float64, 0, 100),
 		Map:    make(map[string]int),
+		ff:     func(n int) int { return n },
 	}
 
 	// Set options.
 	ex.init(options...)
 
-	fmt.Printf("Example initalized: %+v", ex)
+	fmt.Printf("Example initalized: %+v\n", ex)
 	return ex
-}
-
-// Options
-
-// Option type is used to pass options to Example.
-type Option func(*Example)
-
-// N sets field N in Example.
-func N(n int) Option {
-	return func(ex *Example) {
-		ex.N = n
-	}
-}
-
-// FSlice sets field FSlice in Example.
-func FSlice(f []float64) Option {
-	return func(ex *Example) {
-		ex.FSlice = f
-	}
-}
-
-// Map sets field Map in Example.
-func Map(m map[string]int) Option {
-	return func(ex *Example) {
-		ex.Map = m
-	}
-}
-
-// initExample applies options to Example.
-func (ex *Example) init(options ...Option) {
-	for _, option := range options {
-		option(ex)
-	}
-}
-
-type ZZZ struct {
-	f1 string
-	f2 uint64
 }
