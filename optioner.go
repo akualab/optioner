@@ -28,6 +28,8 @@ the tag `opt:"-"`.
 
 For example, given this snippet,
 
+  package example
+
   //go:generate optioner -type Example
   type Example struct {
 	  N      int
@@ -55,7 +57,7 @@ go generate will generate option functions for fields N, FSlice, Map, and ff. Yo
 users can now set options as follows:
 
   myFunc := func(n int) int {return 2 * n}
-  ex := example.NewExample("test", N(22), Ff(myFunc))
+  ex := example.NewExample("test", example.N(22), example.Ff(myFunc))
 
 the new struct "ex" will use default values for "FSlice" and "Map", and custom values for
 "N" and "ff". Because the argument "name" is required, the field "name" is excluded using a tag.
