@@ -47,6 +47,7 @@ For example, given this snippet,
 		  N:      10,
 		  FSlice: make([]float64, 0, 100),
 		  Map:    make(map[string]int),
+		  ff:     func(n int) int { return n },
 	  }
 
 	  // Set options.
