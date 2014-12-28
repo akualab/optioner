@@ -63,8 +63,8 @@ users can now set options as follows:
 the new struct "ex" will use default values for "FSlice" and "Map", and custom values for
 "N" and "ff". Because the argument "name" is required, the field "name" is excluded using a tag.
 
-struct fields don't need to exported, however, the corresponding option will be exported by
-capitalizing the first letter.
+struct fields don't need to be exported, however, the corresponding option will be exported by
+capitalizing the first letter. Documentation for options is also auto-generated.
 */
 package main
 
