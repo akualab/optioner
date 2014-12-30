@@ -9,7 +9,7 @@ package example
 // Option type is used to set options in Example.
 type option func(*Example) option
 
-// Option method sets the options. Returns original option for last arg.
+// Option method sets the options. Returns option to restore original values.
 func (t *Example) Option(options ...option) (original option) {
 	for _, opt := range options {
 		original = combineOptions(original, opt(t))

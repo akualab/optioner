@@ -139,7 +139,7 @@ func main() {
 	g.Printf("// Option type is used to set options in %s.\n", g.typeName)
 	g.Printf("type option func(*%s) option\n", g.typeName)
 	g.Printf("\n")
-	g.Printf("// Option method sets the options. Returns original option for last arg.\n")
+	g.Printf("// Option method sets the options. Returns option to restore original values.\n")
 	g.Printf("func (t *%s) Option(options ...option) (original option) {\n", g.typeName)
 	g.Printf("for _, opt := range options {\n")
 	g.Printf("original = combineOptions(original, opt(t))\n")
