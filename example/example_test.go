@@ -34,3 +34,40 @@ func TestExample(t *testing.T) {
 	}
 
 }
+
+// All options must be properly rollbacked (i.e. reverted to old values).
+func TestExampleRollback(t *testing.T) {
+
+	ex := NewExample("test", N(22), Map(map[string]int{"one": 1}))
+
+	if ex.N != 22 {
+		t.Errorf("N is %d, expected 22", ex.N)
+	}
+
+	if len(ex.Map) != 1 {
+		t.Errorf("len(ex.Map) is %d, expected 1", ex.ff(10))
+	}
+
+	// Change two options. original keeps the previous values.
+	original := ex.Option(N(33), Map(map[string]int{"one": 1, "two": 2}))
+
+	if ex.N != 33 {
+		t.Errorf("N is %d, expected 33", ex.N)
+	}
+
+	if len(ex.Map) != 2 {
+		t.Errorf("len(ex.Map) is %d, expected 2", ex.ff(10))
+	}
+
+	// Restore original value.
+	ex.Option(original)
+
+	if ex.N != 22 {
+		t.Errorf("N is %d, expected 22", ex.N)
+	}
+
+	if len(ex.Map) != 1 {
+		t.Errorf("len(ex.Map) is %d, expected 1", ex.ff(10))
+	}
+
+}
