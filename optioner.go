@@ -161,7 +161,9 @@ func combineOptions(a, b option) option {
 		prevB := b(t)
 		return combineOptions(prevB, prevA)
 	}
-}`)
+}
+
+`)
 
 	for _, opt := range g.options {
 		tname := strings.Title(opt.name)

@@ -29,7 +29,9 @@ func combineOptions(a, b option) option {
 		prevB := b(t)
 		return combineOptions(prevB, prevA)
 	}
-} // N sets a value for instances of type Example.
+}
+
+// N sets a value for instances of type Example.
 func N(o int) option {
 	return func(t *Example) option {
 		previous := t.N
