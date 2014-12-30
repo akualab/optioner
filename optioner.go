@@ -139,14 +139,31 @@ func main() {
 	g.Printf("// Option type is used to set options in %s.\n", g.typeName)
 	g.Printf("type option func(*%s) option\n", g.typeName)
 	g.Printf("\n")
-	g.Printf("// Option method sets the options. Returns previous option for last arg.\n")
-	g.Printf("func (t *%s) Option(options ...option) (previous option) {\n", g.typeName)
+	g.Printf("// Option method sets the options. Returns option to restore original values.\n")
+	g.Printf("func (t *%s) Option(options ...option) (original option) {\n", g.typeName)
 	g.Printf("for _, opt := range options {\n")
-	g.Printf("previous = opt(t)\n")
+	g.Printf("original = combineOptions(original, opt(t))\n")
 	g.Printf("}\n")
-	g.Printf("return previous\n")
+	g.Printf("return original\n")
 	g.Printf("}\n")
 	g.Printf("\n")
+
+	g.Printf(`
+func combineOptions(a, b option) option {
+	if a==nil {
+		return b
+	}
+	if b==nil {
+		return a
+	}
+	return func(t *Example) option{
+		prevA := a(t)
+		prevB := b(t)
+		return combineOptions(prevB, prevA)
+	}
+}
+
+`)
 
 	for _, opt := range g.options {
 		tname := strings.Title(opt.name)
