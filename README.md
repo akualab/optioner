@@ -12,8 +12,8 @@ How ot use:
 
 ```
 go get github.com/akualab/optioner
-go intall github.com/akualab/optioner
-cd $GOPATH/github.com/akualab/optioner/example
+go install github.com/akualab/optioner
+cd $GOPATH/src/github.com/akualab/optioner/example
 go generate
 go test
 ```
