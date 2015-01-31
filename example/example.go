@@ -16,7 +16,7 @@ type Example struct {
 
 // NewExample creates an example.
 // name is required.
-func NewExample(name string, options ...option) *Example {
+func NewExample(name string, options ...optExample) *Example {
 
 	// Set required values and initialize optional fields with default values.
 	ex := &Example{
@@ -32,4 +32,28 @@ func NewExample(name string, options ...option) *Example {
 
 	fmt.Printf("Example initalized: %+v\n", ex)
 	return ex
+}
+
+// Person is a human.
+//go:generate optioner -type Person
+type Person struct {
+	Name string
+	Age  int
+	ssn  string `opt:"-"`
+}
+
+// NewExample creates an example.
+// name is required.
+func NewPerson(ssn string, options ...optPerson) *Person {
+
+	// Set required values and initialize optional fields with default values.
+	p := &Person{
+		ssn: ssn,
+	}
+
+	// Set options.
+	p.Option(options...)
+
+	fmt.Printf("Person initalized: %+v\n", p)
+	return p
 }

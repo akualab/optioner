@@ -34,3 +34,17 @@ func TestExample(t *testing.T) {
 	}
 
 }
+
+func TestPerson(t *testing.T) {
+
+	p := NewPerson("111-222-3333", Name("joe"), Age(22))
+
+	if p.Age != 22 {
+		t.Errorf("Age is %d, expected 22", p.Age)
+	}
+
+	if p.Name != "joe" {
+		t.Errorf("Name is %s, expected joe", p.Name)
+	}
+
+}
