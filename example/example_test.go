@@ -5,7 +5,7 @@ import "testing"
 func TestExample(t *testing.T) {
 
 	myFunc := func(n int) int { return 2 * n }
-	ex := NewExample("test", N(22), Ff(myFunc))
+	ex := NewExample("test", N(22), Func(myFunc))
 
 	if ex.N != 22 {
 		t.Errorf("N is %d, expected 22", ex.N)

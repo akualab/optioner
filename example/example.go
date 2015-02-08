@@ -5,18 +5,18 @@ import (
 )
 
 // Example is the struct that will hold optional values.
-//go:generate optioner -type Example
+//go:generate optioner -type Example -m Option
 type Example struct {
 	N      int
 	FSlice []float64 `json:"float_slice"`
 	Map    map[string]int
-	Name   string `opt:"-" json:"name"`
-	ff     func(int) int
+	Name   string        `opt:"-" json:"name"`
+	ff     func(int) int `opt:"Func"`
 }
 
 // NewExample creates an example.
 // name is required.
-func NewExample(name string, options ...optExample) *Example {
+func NewExample(name string, options ...Option) *Example {
 
 	// Set required values and initialize optional fields with default values.
 	ex := &Example{
