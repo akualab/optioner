@@ -96,13 +96,12 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
+	"go/types"
 	"io/ioutil"
 	"log"
 	"os"
 	"reflect"
 	"strings"
-
-	"golang.org/x/tools/go/types"
 )
 
 var typeNameArg = flag.String("type", "", "type name of the options struct; must be set")
