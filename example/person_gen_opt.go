@@ -6,7 +6,7 @@
 
 package example
 
-// Option type is used to set options in Person.
+// optPerson type is used to set options in Person.
 type optPerson func(*Person) optPerson
 
 // Option method sets the options. Returns previous option for last arg.

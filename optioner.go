@@ -104,8 +104,11 @@ import (
 	"strings"
 )
 
-var typeNameArg = flag.String("type", "", "type name of the options struct; must be set")
-var output = flag.String("output", "", "output file name; default srcdir/<type>_gen_opt.go")
+var (
+	typeNameArg  = flag.String("type", "", "type name of the options struct; must be set")
+	typeNameMngl = flag.String("m", "", "type name of the option; defaults to opt<type>")
+	output       = flag.String("output", "", "output file name; default srcdir/<type>_gen_opt.go")
+)
 
 // Usage is a replacement usage function for the flags package.
 func Usage() {
@@ -134,7 +137,15 @@ func main() {
 		g Generator
 	)
 
+	if *typeNameMngl == "" {
+		g.optName = "opt" + *typeNameArg
+	} else {
+		g.optName = *typeNameMngl
+	}
 	g.typeName = *typeNameArg
+	if g.optName == g.typeName {
+		log.Fatal("option and type names must be different")
+	}
 	g.options = []option{}
 
 	g.parsePackage()
@@ -145,13 +156,13 @@ func main() {
 	g.Printf(header)
 	g.Printf("package %s", g.packageName)
 	g.Printf("\n")
-	g.Printf("// Option type is used to set options in %s.\n", g.typeName)
+	g.Printf("// %s type is used to set options in %s.\n", g.optName, g.typeName)
 	//	g.Printf("type option func(*%s) option\n", g.typeName)
-	g.Printf("type opt%[1]s func(*%[1]s) opt%[1]s\n", g.typeName)
+	g.Printf("type %s func(*%s) %[1]s\n", g.optName, g.typeName)
 	g.Printf("\n")
 	g.Printf("// Option method sets the options. Returns previous option for last arg.\n")
 	//	g.Printf("func (t *%s) Option(options ...option) (previous option) {\n", g.typeName)
-	g.Printf("func (t *%[1]s) Option(options ...opt%[1]s) (previous opt%[1]s) {\n", g.typeName)
+	g.Printf("func (t *%[1]s) Option(options ...%s) (previous %[2]s) {\n", g.typeName, g.optName)
 	g.Printf("for _, opt := range options {\n")
 	g.Printf("previous = opt(t)\n")
 	g.Printf("}\n")
@@ -160,10 +171,10 @@ func main() {
 	g.Printf("\n")
 
 	for _, opt := range g.options {
-		tname := strings.Title(opt.name)
+		tname := strings.Title(opt.optName)
 		g.Printf("// %s sets a value for instances of type %s.\n", tname, g.typeName)
-		g.Printf("func %s(o %s) opt%s {\n", tname, opt.typ, g.typeName)
-		g.Printf("return func(t *%[1]s) opt%[1]s {\n", g.typeName)
+		g.Printf("func %s(o %s) %s {\n", tname, opt.typ, g.optName)
+		g.Printf("return func(t *%s) %s {\n", g.typeName, g.optName)
 		g.Printf("previous := t.%s\n", opt.name)
 		g.Printf("t.%s = o\n", opt.name)
 		g.Printf("return %s(previous)\n", tname)
@@ -225,18 +236,25 @@ func (g *Generator) parseFields(fn string) bool {
 						for _, field := range fields {
 							id := field.Names[0]
 
+							var optName string
 							// check struct tags to exclude fields
 							if field.Tag != nil {
 								s := strings.Replace(field.Tag.Value, "`", "", -1)
 								tag := reflect.StructTag(s).Get("opt")
-								if tag == "-" {
+								switch tag {
+								case "-":
 									continue
+								default:
+									optName = tag
 								}
+							}
+							if optName == "" {
+								optName = id.Name
 							}
 							typeExpr := field.Type
 							typ := types.ExprString(typeExpr)
-							g.options = append(g.options, option{name: id.Name, typ: typ})
-							log.Printf("generating option for field \"%s\" of type \"%s\")", id.Name, typ)
+							g.options = append(g.options, option{name: id.Name, typ: typ, optName: optName})
+							log.Printf("generating option %q for field %q of type %q)", optName, id.Name, typ)
 						}
 						return true
 					} else {
@@ -255,12 +273,14 @@ type Generator struct {
 	buf         bytes.Buffer // Accumulated output.
 	options     []option
 	typeName    string
+	optName     string
 	packageName string
 }
 
 type option struct {
-	name string
-	typ  string
+	name    string
+	typ     string
+	optName string
 }
 
 func (g *Generator) Printf(format string, args ...interface{}) {
